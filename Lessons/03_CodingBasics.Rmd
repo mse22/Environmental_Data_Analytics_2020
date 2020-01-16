@@ -78,30 +78,37 @@ dataframe1$ID
 ```
 Question: How do the different types of data appear in the Environment tab?
 
-> Answer: 
+> Answer: Different types of data appear in the Environment tab according to the commands we run
 
 Question: In the R chunk below, write "dataframe1$". Press `tab` after you type the dollar sign. What happens?
 
-> Answer: 
+> Answer: It gives you options to choose: ID, COLOR, PASSED
 
 ### Coding challenge
 
 Find a ten-day forecast of temperatures (Fahrenheit) for Durham, North Carolina. Create two vectors, one representing the high temperature on each of the ten days and one representing the low.
 
 ```{r}
-
+maxtempF <- c(62,45,50,50,40,40,45,52,54,58)
+mintempF <- c(31,29,43,24,23,23,26,30,42,41)
 ```
 
 Now, create two additional vectors that include the ten-day forecast for the high and low temperatures in Celsius.
 
 ```{r}
+maxtempC = 5/9 * (maxtempF - 32)
+mintempC = 5/9 * (maxtempF - 32)
 
 ```
 
 Combine your four vectors into a data frame and add informative column names.
 
 ```{r}
-
+g <- c(62,45,50,50,40,40,45,52,54,58)
+h <- c(31,29,43,24,23,23,26,30,42,41)
+i <- c(maxtempC = 5/9 * (maxtempF - 32))
+j <- c(mintempC = 5/9 * (maxtempF - 32))
+dataframe1 <- data.frame(g,h,i,j)
 ```
 
 Use the common functions `summary` and `sd` to obtain basic data summaries of the ten-day forecast. How would you call these functions differently for the entire data frame vs. a single column? Attempt to demonstrate both options below.
