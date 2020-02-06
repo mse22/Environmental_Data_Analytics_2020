@@ -84,7 +84,7 @@ print(O3plot)
 
 # Fix this code
 O3plot2 <- ggplot(EPAair) +
-  geom_point(aes(x = Date, y = Ozone, color = "blue"))
+  geom_point(aes(x = Date, y = Ozone), color = "blue") #correccted it; earlier the closing bracket was after "blue" - Monisha
 print(O3plot2)
 
 # Add additional variables
@@ -119,9 +119,18 @@ print(PMplot.line)
 # Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 
 # 1. 
-# Plot surface temperatures by day of  year. 
+# Plot surface temperatures by day of year. 
 # Color your points by year, and facet by lake in two rows.
 
+ggplot(PeterPaul.chem.nutrients, aes(x = daynum, y = temperature_C)) + 
+  geom_point()
+
+O3plot <- ggplot(PeterPaul.chem.nutrients) +
+  geom_point(aes(x = daynum, y = temperature_C))
+print(O3plot)
+
+PP.temo <-
+  ggplot(subset(PeterPaul.chem.nutrients) # incomplete Kateri's code :(
 
 #2. 
 # Plot temperature by date. Color your points by depth.
@@ -228,5 +237,5 @@ print(Nutrientplot6)
 # Create several types of plots depicting PM2.5, divided by year. 
 # Choose which plot displays the data best and justify your choice. 
 
-
+# look at the caveats link to see why we didnt explore bar plots today - Monisha
 ```
