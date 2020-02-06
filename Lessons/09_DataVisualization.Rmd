@@ -87,6 +87,7 @@ O3plot6 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone))
 print(O3plot6)  
 
+# make use of theb help function to look at the various themes - monisha
 ```
 
 ### Adjusting multiple components of your plots
@@ -107,6 +108,7 @@ O3plot7 <- ggplot(EPAair, aes(x = Date, y = Ozone)) +
   theme(axis.text.x = element_text(angle = 45,  hjust = 1))
 print(O3plot7)  
 
+#AQI indexes - google it - monisha - compare relative - take concentrations and convert to common scales that is good, moderate etc. 
 ```
 
 ### Color palettes
@@ -174,11 +176,13 @@ print(NvsP)
 # change your legend labels
 NvsP2 <-
   ggplot(PeterPaul.chem.nutrients, aes(x = tp_ug, y = tn_ug, color = depth, shape = lakename)) +
-  geom_point(alpha = 0.7, size = 2.5) +
-  #labs() + # change your legend labels here
-  scale_shape_manual(values = c(15, 17)) +
+  geom_point(alpha = 0.7, size = 2.5) + 
+  labs(x = expression(paste("TP (", mu, "g/L)")),
+       y = expression(paste("TN (", mu, "g/L)")),
+       color = "Depth (m)", shape = "") + # change your legend labels here - edited and working now - monisha
+  scale_shape_manual(values = c(15, 17)) + 
   #scale_color_distiller(palette = "Blues", direction = 1) + # use scale_color_brewer for discrete variables
-  scale_color_viridis(option = "magma", direction = -1) +
+  scale_color_viridis(option = "magma", direction = -1,end = 0.8) +
   theme(legend.position = "right", 
         legend.text = element_text(size = 12), legend.title = element_text(size = 12))
 print(NvsP2)
@@ -189,8 +193,9 @@ print(NvsP2)
 # try out the different color palette options and choose one (or edit)
 Nutrientplot <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration, color = nutrient)) +
-  geom_boxplot() +
-# place your additional edits here
+  geom_boxplot() + labs(x = expression(paste("TP (", mu, "g/L")),
+       y = expression(paste("TN (", mu, "g/L")))
+# place your additional edits here - edited - monisha - do it later
   scale_y_continuous(expand = c(0, 0)) +
   #scale_color_brewer(palette = "YlGnBu") +
   #scale_color_manual(values = c("#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84")) +
