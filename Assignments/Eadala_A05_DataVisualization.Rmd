@@ -73,7 +73,7 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 ```{r}
 plot1 <- ggplot(PeterPaul.chem.nutrients, aes(x = tp_ug, y = po4, color = lakename)) +
   geom_point() + # To plot phosphorus by phosphate with different color assigned to Peter and Paul lakes
-  geom_smooth(method=lm) + # Adds a l
+  geom_smooth(method = "lm", se = FALSE, color = "black") + # Adds a line of best fit in black
   mytheme +
   ylim(0, 45) + xlim(0,150) + # To adjust the axes to hide extreme values
   ggtitle("Phosphorus by Phosphate") + # To insert the main title
