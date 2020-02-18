@@ -1,0 +1,142 @@
+---
+title: 'Assignment 6: GLMs week 1 (t-test and ANOVA)'
+author: "Monisha Eadala"
+geometry: margin=2.54cm
+output:
+  word_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+## OVERVIEW
+
+This exercise accompanies the lessons in Environmental Data Analytics on t-tests and ANOVAs. 
+
+## Directions
+1. Change "Student Name" on line 3 (above) with your name.
+3. Work through the steps, **creating code and output** that fulfill each instruction.
+4. Be sure to **answer the questions** in this assignment document.
+6. When you have completed the assignment, **Knit** the text and code into a single PDF file.
+8. After Knitting, submit the completed exercise (PDF file) to the dropbox in Sakai. Add your last name into the file name (e.g., "Salk_A06_GLMs_Week1.Rmd") prior to submission.
+
+The completed exercise is due on Tuesday, February 18 at 1:00 pm.
+
+## Set up your session
+
+1. Check your working directory, load the `tidyverse`, `cowplot`, and `agricolae` packages, and import the NTL-LTER_Lake_Nutrients_PeterPaul_Processed.csv dataset. 
+
+2. Change the date column to a date format. Call up `head` of this column to verify.
+
+
+```{r, message = FALSE}
+#1
+getwd()
+library(tidyverse)
+library(cowplot)
+library(agricolae)
+
+PeterPaul.nutrients <- read.csv("./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaul_Processed.csv")
+
+#2
+PeterPaul.nutrients$sampledate <- as.Date(PeterPaul.nutrients$sampledate, format = "%Y-%m-%d") # Setting date to date format
+class(PeterPaul.nutrients$sampledate) # Calling up head of the column to verify
+
+```
+
+
+## Wrangle your data
+
+3. Wrangle your dataset so that it contains only surface depths and only the years 1993-1996, inclusive. Set month as a factor.
+```{r}
+class(PeterPaul.nutrients$month) # Checking class of month column
+PeterPaul.nutrients$month <- as.factor(PeterPaul.nutrients$month) # Setting month as a factor
+
+surface.depths <- 
+  PeterPaul.nutrients %>%
+  filter(depth == 0) %>%
+  filter(year4 == 1993 | year4 == 1994 | year4 == 1995 | year4 == 1996) # Wrangling the dataset so that it contains only surface depths and only the years 1993-1996, inclusive
+
+```
+
+## Analysis
+
+Peter Lake was manipulated with additions of nitrogen and phosphorus over the years 1993-1996 in an effort to assess the impacts of eutrophication in lakes. You are tasked with finding out if nutrients are significantly higher in Peter Lake than Paul Lake, and if these potential differences in nutrients vary seasonally (use month as a factor to represent seasonality). Run two separate tests for TN and TP.
+
+4. Which application of the GLM will you use (t-test, one-way ANOVA, two-way ANOVA with main effects, or two-way ANOVA with interaction effects)? Justify your choice.
+
+> Answer: I will use two-way ANOVA with interaction effects, because there are two categorical explanatory variable with one categorical variable wiht two categories and than other with more than two catergories. T-test will require only one categorical explanatory variable with only two categories, and one-way ANOVA will require only one categorical explanatory variable with more than two categories; therefore, they are both not suitable. In this case, we have "month" and "lakename" as two categorical explanatory variables; therefore two-way ANOVA is the most suitable. A two-way ANOVA with interaction effects is safer to use here since we are not sure how the the variables "months" and "lakes" interact with each other. After running the two-way ANOVA with interaction effects, if the interaction is significant, we interpret pairwise differences for the interaction. If the interaction is not significant, we interpret differences for the main effects only.
+
+5. Run your test for TN. Include examination of groupings and consider interaction effects, if relevant.
+
+6. Run your test for TP. Include examination of groupings and consider interaction effects, if relevant.
+
+```{r}
+#5
+surface.depths.TN.anova.2way <- aov(data = surface.depths, tn_ug ~ lakename * month)
+summary(surface.depths.TN.anova.2way) # Format as aov
+
+surface.depths.TN.anova.2way2 <- lm(data = surface.depths, tn_ug ~ lakename * month)
+summary(surface.depths.TN.anova.2way2) # Format as lm; another option
+
+# Since the interaction is not significant for the above, we interpret differences for the main effects only
+
+#6
+surface.depths.TP.anova.2way <- aov(data = surface.depths, tp_ug ~ lakename * month)
+summary(surface.depths.TP.anova.2way) # Format as aov
+
+surface.depths.TP.anova.2way2 <- lm(data = surface.depths, tp_ug ~ lakename * month)
+summary(surface.depths.TP.anova.2way2) # Format as lm; another option
+
+# Since the interaction is significant, we interpret pairwise differences for the interaction
+TukeyHSD(surface.depths.TP.anova.2way) # Runs a post-hoc test for pairwise differences
+
+lake.month.interaction <- with(surface.depths, interaction(lakename, month))
+surface.depths.anova.2way3 <- aov(data = surface.depths, tp_ug ~ lake.month.interaction)
+
+lake.month.groups <- HSD.test(surface.depths.anova.2way3, "lake.month.interaction", group = TRUE)
+lake.month.groups
+
+```
+
+7. Create two plots, with TN (plot 1) or TP (plot 2) as the response variable and month and lake as the predictor variables. Hint: you may use some of the code you used for your visualization assignment. Assign groupings with letters, as determined from your tests. Adjust your axes, aesthetics, and color palettes in accordance with best data visualization practices.
+
+8. Combine your plots with cowplot, with a common legend at the top and the two graphs stacked vertically. Your x axes should be formatted with the same breaks, such that you can remove the title and text of the top legend and retain just the bottom legend. 
+
+```{r}
+#7
+plot1 <- ggplot(surface.depths, aes(x = as.factor(month), y = tn_ug, color  = lakename)) +
+  geom_boxplot() + # makes boxplots of nitrogen content along the months for both the lakes
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "right") + # Adjusts the theme
+  ggtitle("Plot 1") + # Names the plot "Plot 1"
+  ylim(0,2500) + # Setting the y-axis limit as 2500 so that we can view the grouping letters without getting cut-off
+  scale_color_viridis_d(option = "magma", begin = 0.3, end = 0.8) + # Adjusts the color palette
+  stat_summary(geom = "text", fun.y = max, vjust = -1, hjust = 1, size = 3.5, # Places the letters right above the maximum points
+               label = c("a", "b", "a", "b", "a", "b", 
+                         "a", "b", "a", "b"), show.legend = FALSE) + # Assigns groupings with letters
+  labs (x = "Month", y = expression(paste("TN (", mu, "g/L)")), color = "Lake Name") # Labels the y-axis appropriately with its units.
+print(plot1)
+
+plot2 <- ggplot(surface.depths, aes(x = as.factor(month), y = tp_ug, color = lakename)) +
+  geom_boxplot() + # makes boxplots of phosphorus content along the months for both the lakes
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "right") + # Adjusts the theme
+  ggtitle("Plot 2") + # To insert the main title of the plot
+  ylim(0,80) + # Setting the y-axis limit as 80 so that we can view the grouping letters without getting cut-off
+  scale_color_viridis_d(option = "magma", begin = 0.3, end = 0.8) + # Adjusts color palette
+  stat_summary(geom = "text", fun.y = max, vjust = -1, hjust = 1, size = 3.5, # Places the letters right above the maximum points
+               label = c("cd", "bcd", "d", "ab", "d", "a", 
+                         "d", "abc", "cd", "abcd"), show.legend = FALSE) + # Assigns groupings with letters, as determined from my test
+  labs (x = "Month", y = expression(paste("TP (", mu, "g/L)")), color = "Lake Name") # Labels the y-axis appropriately with its units.
+print(plot2)
+
+#8
+library(cowplot)
+plot1 = plot1 + theme(legend.position="top", legend.title = element_text(size = 7),
+  legend.text = element_text(size = 6)) + ggtitle("Plot 1 & Plot 2") # Takes the legend position to the top, minimizes the size of the legend, and renames the plot as "Plot 1 & Plot 2"
+plot2 = plot2 + theme(legend.position = "none") + ggtitle("") # Removes the legend and title from plot2
+plot_grid(plot1, plot2,nrow = 2, align = 'h', rel_heights = c(1.3, 1)) # Combines the two plots
+```
+
+
+
+
