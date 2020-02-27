@@ -168,11 +168,16 @@ shapiro.test(EnoDischarge.late.subsample$discharge.mean)
 var.test(EnoDischarge.early$discharge.mean, EnoDischarge.late$discharge.mean)
 
 wilcox.test(EnoDischarge.early$discharge.mean, EnoDischarge.late$discharge.mean)
+
+summary(EnoDischarge.early$discharge.mean)
+summary(EnoDischarge.late$discharge.mean)
 ```
 
 How might you interpret the results of this test, and how might you represent them graphically?
 
->
+> Mean daily dischange in the Eno River from 1927-1971 was significantly higher than mean daily dischage from 1985-2019 (Wilcoxon test, W = 1.17*10^8, p < 0.0001)
+> We can use a boxplot to represent them graphically
+
 
 ### Monotonic trend analysis
 
